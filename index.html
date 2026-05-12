@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#D4537E"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Raji's Wealth Brain"/>
+<title>Raji's Wealth Brain</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --p50:#FDF0F5;--p100:#F9D0E2;--p200:#F3A8C8;--p300:#EB7CAA;--p400:#D4537E;--p500:#B83D66;--p600:#993556;--p700:#72243E;--p800:#4B1528;--p900:#2E0C18;
+  --bg:#FDF0F5;--surface:#fff;--card:#fff;--border:#F3A8C8;--border2:#F9D0E2;
+  --text:#2E0C18;--text2:#72243E;--text3:#B83D66;--muted:#993556;
+  --green:#1D9E75;--amber:#BA7517;--red:#D85A30;
+  --radius:14px;--radius-sm:10px;--radius-xs:7px;
+  --shadow:0 2px 16px rgba(180,60,100,0.10);
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--text);}
+#app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto;position:relative;overflow:hidden;background:var(--bg);}
+
+/* NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid var(--border2);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;border:none;background:none;cursor:pointer;gap:3px;font-size:10px;color:var(--muted);transition:color .2s;}
+.nav-btn.active{color:var(--p400);}
+.nav-btn svg{width:22px;height:22px;stroke-width:1.8;}
+.nav-btn.active svg{stroke-width:2.2;}
+
+/* SCREENS */
+.screen{display:none;flex:1;flex-direction:column;overflow:hidden;padding-bottom:70px;}
+.screen.active{display:flex;}
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 8px;}
+.scroll-area::-webkit-scrollbar{display:none;}
+
+/* HEADER */
+.topbar{padding:16px 16px 10px;background:var(--bg);flex-shrink:0;}
+.topbar-row{display:flex;align-items:center;justify-content:space-between;}
+.topbar h1{font-size:20px;font-weight:700;color:var(--p500);letter-spacing:-0.4px;}
+.topbar p{font-size:12px;color:var(--text3);margin-top:2px;}
+.avatar-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--p300),var(--p500));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;border:none;cursor:pointer;}
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border2);}
+.card-sm{background:var(--card);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;border:1px solid var(--border2);}
+.label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.val{font-size:26px;font-weight:700;color:var(--p500);}
+.val-sm{font-size:18px;font-weight:700;color:var(--p500);}
+.sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* METRIC GRID */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.metric-card{background:var(--card);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border2);box-shadow:var(--shadow);}
+.metric-card .m-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.metric-card .m-val{font-size:20px;font-weight:700;color:var(--p500);}
+.metric-card .m-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+.metric-card.green .m-val{color:var(--green);}
+.metric-card.amber .m-val{color:var(--amber);}
+.metric-card.red .m-val{color:var(--red);}
+
+/* PROGRESS BAR */
+.progress-wrap{margin-bottom:12px;}
+.progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.progress-name{font-size:13px;font-weight:500;color:var(--text);}
+.progress-amt{font-size:12px;color:var(--muted);}
+.progress-track{height:6px;background:var(--p100);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--p300),var(--p500));border-radius:3px;transition:width .6s ease;}
+.progress-fill.green{background:linear-gradient(90deg,#5DCAA5,var(--green));}
+
+/* ACCOUNTS */
+.account-item{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--border2);}
+.account-item:last-child{border-bottom:none;}
+.account-dot{width:8px;height:8px;border-radius:50%;margin-right:10px;flex-shrink:0;}
+.account-info{flex:1;}
+.account-name{font-size:13px;font-weight:600;color:var(--text);}
+.account-purpose{font-size:11px;color:var(--muted);margin-top:1px;}
+.account-bal{font-size:14px;font-weight:700;color:var(--p500);}
+.account-bal.neg{color:var(--red);}
+.account-bal.unset{color:var(--muted);font-size:12px;font-weight:500;}
+.edit-dot{width:18px;height:18px;border-radius:50%;background:var(--p50);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-left:8px;cursor:pointer;flex-shrink:0;}
+
+/* BUTTONS */
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;letter-spacing:.01em;}
+.btn-primary:active{transform:scale(.98);}
+.btn-secondary{padding:10px 18px;background:var(--p50);color:var(--p500);border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;font-weight:600;cursor:pointer;}
+.btn-secondary:active{transform:scale(.98);}
+.btn-pink-outline{width:100%;padding:12px;background:transparent;color:var(--p500);border:1.5px solid var(--p300);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;}
+
+/* INPUTS */
+input[type=text],input[type=number],textarea,select{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:14px;color:var(--text);background:var(--surface);outline:none;font-family:var(--font);appearance:none;}
+input:focus,textarea:focus,select:focus{border-color:var(--p400);}
+textarea{resize:none;min-height:80px;line-height:1.5;}
+.input-group{margin-bottom:14px;}
+.input-label{font-size:12px;font-weight:600;color:var(--text3);margin-bottom:6px;display:block;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23B83D66' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+
+/* CHAT */
+.chat-messages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+.chat-messages::-webkit-scrollbar{display:none;}
+.msg-row{display:flex;gap:8px;max-width:92%;}
+.msg-row.user{align-self:flex-end;flex-direction:row-reverse;}
+.msg-row.bot{align-self:flex-start;}
+.bubble{padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.55;}
+.bot .bubble{background:var(--card);color:var(--text);border-radius:4px 16px 16px 16px;border:1px solid var(--border2);}
+.user .bubble{background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;border-radius:16px 4px 16px 16px;}
+.msg-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.bot-av{background:var(--p100);color:var(--p600);}
+.user-av{background:var(--p500);color:#fff;}
+.chat-input-bar{padding:10px 12px;background:var(--surface);border-top:1px solid var(--border2);display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.chat-input-bar input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:24px;font-size:14px;outline:none;background:var(--bg);}
+.chat-input-bar input:focus{border-color:var(--p400);}
+.send-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p400),var(--p600));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.send-btn svg{width:18px;height:18px;}
+.chips{padding:8px 12px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{white-space:nowrap;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--p500);font-size:12px;font-weight:500;cursor:pointer;flex-shrink:0;}
+.chip:active{background:var(--p50);}
+
+/* CATCHUP */
+.date-block{background:var(--card);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;border:1px solid var(--border2);box-shadow:var(--shadow);}
+.date-header{padding:12px 16px;background:linear-gradient(135deg,var(--p400),var(--p600));display:flex;align-items:center;justify-content:space-between;}
+.date-header .date-str{font-size:14px;font-weight:700;color:#fff;}
+.date-header .date-day{font-size:11px;color:rgba(255,255,255,.75);}
+.date-status{font-size:11px;padding:3px 8px;border-radius:10px;font-weight:600;}
+.date-status.done{background:rgba(255,255,255,.25);color:#fff;}
+.date-status.pending{background:rgba(255,200,0,.25);color:#fff;}
+.date-body{padding:14px 16px;}
+.date-q{font-size:13px;color:var(--text2);margin-bottom:10px;font-weight:500;}
+.acc-mini-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.acc-mini-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.acc-mini-label{font-size:12px;color:var(--muted);width:80px;flex-shrink:0;}
+.acc-mini-input{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-xs);font-size:13px;color:var(--text);background:var(--bg);outline:none;}
+.acc-mini-input:focus{border-color:var(--p400);}
+.save-day-btn{width:100%;padding:10px;background:var(--p50);border:1.5px solid var(--p300);border-radius:var(--radius-xs);color:var(--p500);font-size:13px;font-weight:600;cursor:pointer;margin-top:4px;}
+.save-day-btn:active{background:var(--p100);}
+.day-saved{text-align:center;padding:10px;font-size:13px;color:var(--green);font-weight:600;}
+
+/* TAX */
+.tax-section{margin-bottom:14px;}
+.tax-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px;}
+.tax-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border2);}
+.tax-row:last-child{border-bottom:none;}
+.tax-lbl{font-size:13px;color:var(--muted);}
+.tax-val{font-size:13px;font-weight:600;color:var(--text);text-align:right;max-width:55%;}
+.tax-val.ok{color:var(--green);}
+.tax-val.warn{color:var(--amber);}
+.info-banner{background:var(--p50);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;font-size:13px;color:var(--p700);line-height:1.6;}
+.info-banner strong{color:var(--p500);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(46,12,24,.45);z-index:200;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0));max-height:80vh;overflow-y:auto;}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-size:17px;font-weight:700;color:var(--p500);margin-bottom:16px;}
+.modal-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:50%;background:var(--p50);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* SECTION TITLE */
+.section-title{font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:4px 0 10px;}
+
+/* WEEK ALERT */
+.week-alert{background:linear-gradient(135deg,var(--p400),var(--p600));border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;color:#fff;}
+.week-alert .wa-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+.week-alert .wa-sub{font-size:12px;opacity:.85;}
+
+/* LOADING */
+.typing-dot{display:inline-block;width:6px;height:6px;background:var(--p300);border-radius:50%;margin:0 2px;animation:bounce .9s infinite;}
+.typing-dot:nth-child(2){animation-delay:.2s;}
+.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+/* UTIL */
+.row{display:flex;gap:10px;}
+.row>*{flex:1;}
+.mt8{margin-top:8px;}
+.mt12{margin-top:12px;}
+.center{text-align:center;}
+.pink-badge{display:inline-block;padding:3px 8px;border-radius:10px;background:var(--p100);color:var(--p600);font-size:11px;font-weight:600;}
+.green-badge{display:inline-block;padding:3px 8px;border-radius:10px;background:#E1F5EE;color:var(--green);font-size:11px;font-weight:600;}
+.red-badge{display:inline-block;padding:3px 8px;border-radius:10px;background:#FAECE7;color:var(--red);font-size:11px;font-weight:600;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchScreen('dashboard')" id="nav-dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-btn" onclick="switchScreen('checkin')" id="nav-checkin">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14l3 3 5-5"/></svg>
+      Check-in
+    </button>
+    <button class="nav-btn" onclick="switchScreen('catchup')" id="nav-catchup">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      Catch-up
+    </button>
+    <button class="nav-btn" onclick="switchScreen('chat')" id="nav-chat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Chat
+    </button>
+    <button class="nav-btn" onclick="switchScreen('tax')" id="nav-tax">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="14 3 14 9 20 9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+      Tax
+    </button>
+  </nav>
+
+  <!-- ═══════════════════════════════════ DASHBOARD ═══ -->
+  <div class="screen active" id="screen-dashboard">
+    <div class="topbar">
+      <div class="topbar-row">
+        <div>
+          <h1>Raji's Wealth Brain</h1>
+          <p id="dash-date">Loading...</p>
+        </div>
+        <button class="avatar-btn" onclick="openUpdateModal()">R</button>
+      </div>
+    </div>
+    <div class="scroll-area">
+      <div id="week-alert-box"></div>
+      <div class="section-title">Account balances</div>
+      <div class="card" style="padding:4px 14px;">
+        <div class="account-item">
+          <div class="account-dot" style="background:var(--p400)"></div>
+          <div class="account-info"><div class="account-name">ICICI (Money Moves)</div><div class="account-purpose">Day-to-day spending</div></div>
+          <div id="bal-icici" class="account-bal unset">tap R to set</div>
+          <div class="edit-dot" onclick="openBalModal('icici')">✏️</div>
+        </div>
+        <div class="account-item">
+          <div class="account-dot" style="background:var(--green)"></div>
+          <div class="account-info"><div class="account-name">UBI Wealth Vault</div><div class="account-purpose">Fees, buffer, safety</div></div>
+          <div id="bal-ubi" class="account-bal unset">tap R to set</div>
+          <div class="edit-dot" onclick="openBalModal('ubi')">✏️</div>
+        </div>
+        <div class="account-item">
+          <div class="account-dot" style="background:var(--amber)"></div>
+          <div class="account-info"><div class="account-name">Slice</div><div class="account-purpose">Lifestyle reserve</div></div>
+          <div id="bal-slice" class="account-bal unset">tap R to set</div>
+          <div class="edit-dot" onclick="openBalModal('slice')">✏️</div>
+        </div>
+        <div class="account-item">
+          <div class="account-dot" style="background:var(--red)"></div>
+          <div class="account-info"><div class="account-name">Credit Card (6004)</div><div class="account-purpose">Outstanding bill</div></div>
+          <div id="bal-cc" class="account-bal unset">tap R to set</div>
+          <div class="edit-dot" onclick="openBalModal('cc')">✏️</div>
+        </div>
+      </div>
+
+      <div class="section-title">Net position</div>
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="m-label">Total liquid</div>
+          <div class="m-val" id="total-liquid">—</div>
+          <div class="m-sub">All 3 accounts</div>
+        </div>
+        <div class="metric-card red">
+          <div class="m-label">CC outstanding</div>
+          <div class="m-val" id="total-cc">—</div>
+          <div class="m-sub">May 2026 bill</div>
+        </div>
+        <div class="metric-card green">
+          <div class="m-label">MacBook saved</div>
+          <div class="m-val" id="dash-macbook">—</div>
+          <div class="m-sub" id="dash-macbook-sub">Target ₹79,999</div>
+        </div>
+        <div class="metric-card amber">
+          <div class="m-label">Safety net</div>
+          <div class="m-val" id="dash-safety">—</div>
+          <div class="m-sub" id="dash-safety-sub">Target ₹15,000</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="section-title" style="margin-bottom:0">Dream jar goals</div>
+        <button class="btn-secondary" onclick="openAddGoalModal()" style="padding:6px 12px;font-size:12px">+ Add goal</button>
+      </div>
+      <div id="goals-container"></div>
+
+      <div class="section-title">SIP tracker</div>
+      <div class="card">
+        <div class="tax-row"><span class="tax-lbl">Monthly SIP</span><span class="tax-val" id="sip-monthly">₹1,000/month</span></div>
+        <div class="tax-row"><span class="tax-lbl">Total invested</span><span class="tax-val" id="sip-total">tap to update</span></div>
+        <div class="tax-row"><span class="tax-lbl">Started</span><span class="tax-val">Oct 2025</span></div>
+        <div class="tax-row"><span class="tax-lbl">Status</span><span class="tax-val ok" id="sip-status">Active</span></div>
+        <button class="btn-pink-outline mt8" onclick="openUpdateModal()">Update SIP details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ CHECK-IN ═══ -->
+  <div class="screen" id="screen-checkin">
+    <div class="topbar">
+      <div class="topbar-row">
+        <div><h1>Daily check-in</h1><p id="checkin-date">Today</p></div>
+        <span class="pink-badge" id="checkin-streak">0 day streak</span>
+      </div>
+    </div>
+    <div class="scroll-area">
+      <div class="info-banner">Tell me what happened today from each account. Write amounts + what for. If nothing happened, write <strong>nil</strong>.</div>
+      <div class="section-title">Today's transactions</div>
+      <div class="card">
+        <div class="input-group">
+          <label class="input-label">💳 ICICI (day-to-day)</label>
+          <textarea id="ci-icici" placeholder="e.g. ₹140 auto morning, ₹50 coffee Shiv Sagar, nil"></textarea>
+        </div>
+        <div class="input-group">
+          <label class="input-label">🏦 UBI Wealth Vault</label>
+          <textarea id="ci-ubi" placeholder="e.g. ₹500 grocery zepto, nil"></textarea>
+        </div>
+        <div class="input-group">
+          <label class="input-label">✨ Slice</label>
+          <textarea id="ci-slice" placeholder="e.g. ₹323 California Burrito, nil"></textarea>
+        </div>
+        <div class="input-group">
+          <label class="input-label">💳 Credit Card (6004)</label>
+          <textarea id="ci-cc" placeholder="e.g. ₹256 Belgium Waffle, nil"></textarea>
+        </div>
+        <div class="input-group">
+          <label class="input-label">🍎 MacBook savings added today?</label>
+          <input type="text" id="ci-macbook" placeholder="e.g. ₹200 ICICI, nil"/>
+        </div>
+        <div class="input-group">
+          <label class="input-label">🪺 Safety net added today?</label>
+          <input type="text" id="ci-safety" placeholder="e.g. ₹100, nil"/>
+        </div>
+        <button class="btn-primary" onclick="submitCheckin()">Save today's check-in ✓</button>
+      </div>
+      <div id="recent-log"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ CATCH-UP ═══ -->
+  <div class="screen" id="screen-catchup">
+    <div class="topbar">
+      <div class="topbar-row">
+        <div><h1>Catch-up</h1><p>Fill in missing days</p></div>
+        <span class="pink-badge" id="missing-count">Loading...</span>
+      </div>
+    </div>
+    <div class="scroll-area" id="catchup-scroll">
+      <div class="info-banner">Your sheet has gaps from late April to today. Fill each day below — even a rough idea helps. Write <strong>nil</strong> if nothing happened that day.</div>
+      <div id="catchup-dates"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ CHAT ═══ -->
+  <div class="screen" id="screen-chat">
+    <div class="topbar">
+      <div class="topbar-row">
+        <div><h1>Ask your CFO</h1><p>Powered by Claude</p></div>
+        <span class="pink-badge">AI</span>
+      </div>
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="chipSend('Where is my money right now?')">Where's my money?</span>
+      <span class="chip" onclick="chipSend('Analyze my spending patterns from my data')">Spending patterns</span>
+      <span class="chip" onclick="chipSend('Am I on track for my MacBook goal?')">MacBook goal</span>
+      <span class="chip" onclick="chipSend('Should I be worried about my credit card bill?')">CC bill check</span>
+      <span class="chip" onclick="chipSend('Give me a monthly review for May 2026')">Monthly review</span>
+      <span class="chip" onclick="chipSend('How much should I save each month to hit my goals?')">Goal planning</span>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg-row bot">
+        <div class="msg-av bot-av">W</div>
+        <div class="bubble">Hi Raji! I'm your Wealth Brain. I've read your entire diary — 10 accounts, MacBook savings plan, Dream Jar goals, credit card tracker, everything. Ask me anything about your money, or use the chips above to start.</div>
+      </div>
+    </div>
+    <div class="chat-input-bar">
+      <input type="text" id="chat-input" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button class="send-btn" onclick="sendChat()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ TAX ═══ -->
+  <div class="screen" id="screen-tax">
+    <div class="topbar">
+      <div class="topbar-row">
+        <div><h1>Tax basics</h1><p>FY 2025-26 guide</p></div>
+        <span class="pink-badge">ITR-1</span>
+      </div>
+    </div>
+    <div class="scroll-area">
+      <div class="info-banner"><strong>Good news:</strong> Your income from Adhithya Holidays (~₹2,500/month) is well below the ₹3,00,000 exemption limit. You likely owe zero tax for FY 2025-26 — but you still need to file by July 31.</div>
+
+      <div class="card">
+        <div class="tax-section-title">Your tax profile</div>
+        <div class="tax-row"><span class="tax-lbl">Age</span><span class="tax-val">19 (turning 20 Sep 24)</span></div>
+        <div class="tax-row"><span class="tax-lbl">Resident status</span><span class="tax-val">Ordinary resident, India</span></div>
+        <div class="tax-row"><span class="tax-lbl">Income type</span><span class="tax-val">Salary + bank interest</span></div>
+        <div class="tax-row"><span class="tax-lbl">Approximate annual salary</span><span class="tax-val">~₹30,000</span></div>
+        <div class="tax-row"><span class="tax-lbl">Basic exemption limit (new regime)</span><span class="tax-val ok">₹3,00,000</span></div>
+        <div class="tax-row"><span class="tax-lbl">Tax owed FY 2025-26?</span><span class="tax-val ok">Likely ₹0</span></div>
+      </div>
+
+      <div class="card">
+        <div class="tax-section-title">Key deadlines</div>
+        <div class="tax-row"><span class="tax-lbl">Financial year end</span><span class="tax-val">Mar 31, 2026 ✅</span></div>
+        <div class="tax-row"><span class="tax-lbl">ITR filing deadline</span><span class="tax-val warn">July 31, 2026</span></div>
+        <div class="tax-row"><span class="tax-lbl">Form to file</span><span class="tax-val">ITR-1 (Sahaj)</span></div>
+        <div class="tax-row"><span class="tax-lbl">Where to file</span><span class="tax-val" style="color:var(--p500)">incometax.gov.in</span></div>
+      </div>
+
+      <div class="card">
+        <div class="tax-section-title">Documents you'll need</div>
+        <div class="tax-row"><span class="tax-lbl">Form 16</span><span class="tax-val">Ask Adhithya Holidays</span></div>
+        <div class="tax-row"><span class="tax-lbl">Bank statements</span><span class="tax-val">ICICI, UBI, Slice</span></div>
+        <div class="tax-row"><span class="tax-lbl">PAN card</span><span class="tax-val">Required</span></div>
+        <div class="tax-row"><span class="tax-lbl">Aadhaar</span><span class="tax-val">Must be linked to PAN</span></div>
+        <div class="tax-row"><span class="tax-lbl">SIP statements</span><span class="tax-val">For 80C if applicable</span></div>
+      </div>
+
+      <div class="card">
+        <div class="tax-section-title">Section 80C — save tax (future)</div>
+        <div class="info-banner" style="margin-bottom:0">Once your income exceeds ₹3L, invest here to reduce taxable income by up to ₹1.5L/year: SIP in ELSS funds, PPF (₹500 min), life insurance premium. Your SIP already counts if it's in ELSS.</div>
+      </div>
+
+      <div class="card">
+        <div class="tax-section-title">How to file ITR-1 step by step</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.8;">
+          <p style="margin-bottom:8px">1. Go to <strong style="color:var(--p500)">incometax.gov.in</strong> → Login with PAN</p>
+          <p style="margin-bottom:8px">2. e-File → Income Tax Returns → File ITR</p>
+          <p style="margin-bottom:8px">3. Select AY 2026-27, ITR-1 form</p>
+          <p style="margin-bottom:8px">4. Personal info auto-fills from PAN database</p>
+          <p style="margin-bottom:8px">5. Enter salary from Form 16 (Part B)</p>
+          <p style="margin-bottom:8px">6. Enter bank interest (check all 3 banks)</p>
+          <p style="margin-bottom:8px">7. Deductions: enter SIP/80C amounts</p>
+          <p style="margin-bottom:8px">8. Tax computation auto-calculates</p>
+          <p style="margin-bottom:8px">9. Verify via Aadhaar OTP</p>
+          <p>10. Submit — done! You'll get an acknowledgement number.</p>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="switchScreen('chat');chipSend('Walk me through filing ITR-1 for FY 2025-26 — I have salary from Adhithya Holidays and bank interest. What exactly do I enter?')">Ask the AI to walk me through filing ↗</button>
+      <div style="height:12px"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD GOAL MODAL -->
+<div class="modal-overlay" id="modal-add-goal" onclick="if(event.target===this)closeModal('modal-add-goal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add a dream jar goal</div>
+
+    <div class="input-group">
+      <label class="input-label">Goal name</label>
+      <input type="text" id="ag-name" placeholder="e.g. Apple Pencil, Perfume, Trip to Goa"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Target amount (₹)</label>
+      <input type="number" id="ag-target" placeholder="e.g. 7900"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Current savings towards this (₹)</label>
+      <input type="number" id="ag-saved" placeholder="0 if starting fresh"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Is this short-term or long-term?</label>
+      <select id="ag-type" onchange="toggleDeadline()">
+        <option value="">Select...</option>
+        <option value="short">Short-term — I have a deadline in mind</option>
+        <option value="long">Long-term — flexible, no fixed date</option>
+      </select>
+    </div>
+    <div id="ag-deadline-block" style="display:none">
+      <div class="input-group">
+        <label class="input-label">Deadline date</label>
+        <input type="date" id="ag-deadline"/>
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Notes (optional)</label>
+      <input type="text" id="ag-notes" placeholder="e.g. USB-C version, from Nykaa"/>
+    </div>
+    <button class="btn-primary" onclick="saveNewGoal()">Add to Dream Jar ✓</button>
+  </div>
+</div>
+
+<!-- GOAL ACHIEVEMENT MODAL -->
+<div class="modal-overlay" id="modal-goal-achieve" onclick="if(event.target===this)closeModal('modal-goal-achieve')">
+  <div class="modal-sheet" style="text-align:center">
+    <div class="modal-handle"></div>
+    <div style="font-size:40px;margin-bottom:10px" id="achieve-emoji">🎉</div>
+    <div class="modal-title" id="achieve-title" style="text-align:center">Deadline check!</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.6" id="achieve-body"></p>
+    <button class="btn-primary" id="achieve-yes-btn" onclick="markGoalDone()">Yes, I got it! ✓</button>
+    <button class="btn-pink-outline" id="achieve-no-btn" onclick="extendGoal()">Not yet — extend deadline</button>
+  </div>
+</div>
+
+<!-- EXTEND DEADLINE MODAL -->
+<div class="modal-overlay" id="modal-extend" onclick="if(event.target===this)closeModal('modal-extend')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Extend deadline</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">No worries — pick a new date to keep working towards it.</p>
+    <div class="input-group">
+      <label class="input-label">New deadline</label>
+      <input type="date" id="extend-date"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Updated savings so far (₹)</label>
+      <input type="number" id="extend-saved" placeholder="Current amount saved"/>
+    </div>
+    <button class="btn-primary" onclick="saveExtension()">Save new deadline ✓</button>
+  </div>
+</div>
+
+<!-- BALANCE UPDATE MODAL -->
+<div class="modal-overlay" id="modal-bal" onclick="if(event.target===this)closeModal('modal-bal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-bal-title">Update balance</div>
+    <div class="input-group">
+      <label class="input-label">Current balance (₹)</label>
+      <input type="number" id="modal-bal-input" placeholder="Enter amount"/>
+    </div>
+    <div class="input-group" id="modal-cc-note" style="display:none">
+      <div class="info-banner" style="font-size:12px">For CC, enter the total outstanding amount (positive number). It will show as negative.</div>
+    </div>
+    <button class="btn-primary" onclick="saveBalance()">Save balance</button>
+  </div>
+</div>
+
+<!-- FULL UPDATE MODAL -->
+<div class="modal-overlay" id="modal-update" onclick="if(event.target===this)closeModal('modal-update')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Update all balances</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Tell me what's in each account right now. Check your apps.</p>
+
+    <div class="input-group">
+      <label class="input-label">ICICI balance (₹)</label>
+      <input type="number" id="u-icici" placeholder="Current balance"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">UBI balance (₹)</label>
+      <input type="number" id="u-ubi" placeholder="Current balance"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Slice balance (₹)</label>
+      <input type="number" id="u-slice" placeholder="Current balance"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Credit card outstanding (₹)</label>
+      <input type="number" id="u-cc" placeholder="Amount owed"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">MacBook savings total (₹)</label>
+      <input type="number" id="u-macbook" placeholder="Include FDs"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Safety net total (₹)</label>
+      <input type="number" id="u-safety" placeholder="Current total"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">SIP total invested so far (₹)</label>
+      <input type="number" id="u-sip" placeholder="e.g. 7000"/>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Adhi's ₹1,000 lend — returned?</label>
+      <select id="u-lend"><option value="">Select...</option><option value="yes">Yes, returned</option><option value="no">No, still pending</option></select>
+    </div>
+    <button class="btn-primary" onclick="saveAllBalances()">Save everything ✓</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'raji_wealth_brain_v3';
+
+let state = {
+  balances:{icici:null,ubi:null,slice:null,cc:null},
+  goals:{macbook:0,pencil:0},
+  dreamJar:[
+    {id:'macbook',name:'MacBook',target:79999,saved:0,type:'long',deadline:null,notes:'Day-by-day savings plan, FDs started',done:false,createdAt:'2026-03-04'},
+    {id:'pencil',name:'Apple Pencil',target:7900,saved:0,type:'long',deadline:null,notes:'USB-C version',done:false,createdAt:'2026-01-01'}
+  ],
+  sip:{total:null,monthly:1000,active:true},
+  safetyNet:null,
+  lendAdhi:'pending',
+  checkins:{},
+  chatHistory:[],
+  lastFullUpdate:null,
+  achieveCheckDone:{}
+};
+
+function load(){
+  try{
+    const s=localStorage.getItem(STORAGE_KEY);
+    if(s) state=Object.assign(state,JSON.parse(s));
+  }catch(e){}
+}
+
+function save(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
+}
+
+function fmt(n){
+  if(n===null||n===undefined) return null;
+  return '₹'+Math.abs(n).toLocaleString('en-IN');
+}
+
+function today(){
+  return new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function isSunday(){return new Date().getDay()===0;}
+
+function switchScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  if(id==='dashboard') renderDashboard();
+  if(id==='catchup') renderCatchup();
+  if(id==='checkin') renderCheckin();
+}
+
+/* ─── DASHBOARD ─── */
+function renderDashboard(){
+  document.getElementById('dash-date').textContent=today();
+  const b=state.balances;
+
+  function setAcc(id,val,neg){
+    const el=document.getElementById('bal-'+id);
+    if(val===null){el.className='account-bal unset';el.textContent='tap ✏️ to set';}
+    else{el.className='account-bal'+(neg?' neg':'');el.textContent=neg?'−'+fmt(val):fmt(val);}
+  }
+  setAcc('icici',b.icici,false);
+  setAcc('ubi',b.ubi,false);
+  setAcc('slice',b.slice,false);
+  setAcc('cc',b.cc,true);
+
+  const liquid=(b.icici||0)+(b.ubi||0)+(b.slice||0);
+  document.getElementById('total-liquid').textContent=fmt(liquid)||'—';
+  document.getElementById('total-cc').textContent=b.cc!==null?fmt(b.cc):'—';
+
+  const macGoal=state.dreamJar.find(g=>g.id==='macbook');
+  const mac=macGoal?macGoal.saved:0;
+  document.getElementById('dash-macbook').textContent=fmt(mac)||'—';
+  document.getElementById('dash-macbook-sub').textContent=mac?'of ₹79,999 target':'Target ₹79,999';
+
+  const sn=state.safetyNet;
+  document.getElementById('dash-safety').textContent=fmt(sn)||'—';
+  document.getElementById('dash-safety-sub').textContent=sn?'of ₹15,000 target':'Target ₹15,000';
+
+  if(state.sip.total) document.getElementById('sip-total').textContent=fmt(state.sip.total);
+
+  renderGoals();
+  renderWeekAlert();
+}
+
+function renderGoals(){
+  const container=document.getElementById('goals-container');
+  const active=state.dreamJar.filter(g=>!g.done);
+  const done=state.dreamJar.filter(g=>g.done);
+
+  if(!state.dreamJar.length){
+    container.innerHTML='<div class="card" style="text-align:center;padding:20px;color:var(--muted);font-size:13px">No goals yet — tap + Add goal to create your first dream!</div>';
+    return;
+  }
+
+  let html='';
+
+  if(active.length){
+    html+='<div class="card" style="padding:12px 14px;">';
+    active.forEach(g=>{
+      const pct=g.target>0?Math.min(100,Math.round((g.saved/g.target)*100)):0;
+      const isShort=g.type==='short';
+      const deadlinePassed=isShort&&g.deadline&&new Date(g.deadline)<new Date();
+      let deadlineStr='';
+      if(isShort&&g.deadline){
+        const dd=new Date(g.deadline);
+        deadlineStr=dd.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      }
+      html+=`<div class="progress-wrap" style="padding-bottom:12px;margin-bottom:4px;border-bottom:1px solid var(--border2)">
+        <div class="progress-row">
+          <span class="progress-name">${g.name}</span>
+          <span style="display:flex;gap:6px;align-items:center">
+            ${isShort?`<span class="pink-badge" style="font-size:10px">${deadlinePassed?'⚠️ overdue':deadlineStr}</span>`:'<span style="font-size:10px;color:var(--muted)">long-term</span>'}
+            <button onclick="editGoalSavings('${g.id}')" style="border:none;background:none;cursor:pointer;font-size:13px;padding:0">✏️</button>
+            <button onclick="deleteGoal('${g.id}')" style="border:none;background:none;cursor:pointer;font-size:13px;padding:0">🗑</button>
+          </span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <span style="font-size:11px;color:var(--muted)">₹${g.saved.toLocaleString('en-IN')} / ₹${g.target.toLocaleString('en-IN')}</span>
+          <span style="font-size:11px;color:var(--p400);font-weight:600">${pct}%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill${pct>=100?' green':''}" style="width:${pct}%"></div></div>
+        ${g.notes?`<div style="font-size:11px;color:var(--muted);margin-top:4px">${g.notes}</div>`:''}
+      </div>`;
+    });
+    // remove last border
+    html=html.replace(/border-bottom:1px solid var\(--border2\)">[^<]*<\/div>\s*<\/div>\s*<\/div>$/,'border-bottom:none"></div></div></div>');
+    html+='</div>';
+  }
+
+  if(done.length){
+    html+=`<div style="margin-top:4px;margin-bottom:6px" class="section-title">Achieved 🎉</div><div class="card" style="padding:12px 14px;">`;
+    done.forEach(g=>{
+      html+=`<div class="progress-wrap" style="padding-bottom:10px;margin-bottom:2px">
+        <div class="progress-row">
+          <span class="progress-name" style="text-decoration:line-through;color:var(--muted)">${g.name}</span>
+          <span class="green-badge">✓ done</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted)">₹${g.target.toLocaleString('en-IN')} · ${g.doneDate||''}</div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+
+  container.innerHTML=html;
+  checkDeadlines();
+}
+
+function renderWeekAlert(){
+  const box=document.getElementById('week-alert-box');
+  if(!isSunday()){box.innerHTML='';return;}
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const d=new Date();
+  const missing=[];
+  for(let i=6;i>=0;i--){
+    const dd=new Date(d);dd.setDate(d.getDate()-i);
+    const key=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    if(!state.checkins[key]) missing.push(dd.toLocaleDateString('en-IN',{day:'numeric',month:'short'}));
+  }
+  if(missing.length>0){
+    box.innerHTML=`<div class="week-alert"><div class="wa-title">⚠️ Sunday check — missing days this week</div><div class="wa-sub">${missing.join(', ')} — fill in the catch-up tab before the week closes!</div></div>`;
+  }
+}
+
+/* ─── BALANCE MODAL ─── */
+let currentBalKey='';
+function openBalModal(key){
+  currentBalKey=key;
+  const names={icici:'ICICI balance',ubi:'UBI balance',slice:'Slice balance',cc:'Credit card outstanding'};
+  document.getElementById('modal-bal-title').textContent='Update '+names[key];
+  document.getElementById('modal-cc-note').style.display=key==='cc'?'block':'none';
+  const cur=state.balances[key];
+  document.getElementById('modal-bal-input').value=cur||'';
+  document.getElementById('modal-bal').classList.add('open');
+}
+
+function saveBalance(){
+  const v=parseFloat(document.getElementById('modal-bal-input').value);
+  if(!isNaN(v)){
+    state.balances[currentBalKey]=v;
+    save();renderDashboard();
+    closeModal('modal-bal');
+  }
+}
+
+function openUpdateModal(){
+  const b=state.balances;
+  const mac=state.dreamJar.find(g=>g.id==='macbook');
+  if(b.icici) document.getElementById('u-icici').value=b.icici;
+  if(b.ubi) document.getElementById('u-ubi').value=b.ubi;
+  if(b.slice) document.getElementById('u-slice').value=b.slice;
+  if(b.cc) document.getElementById('u-cc').value=b.cc;
+  if(mac&&mac.saved) document.getElementById('u-macbook').value=mac.saved;
+  if(state.safetyNet) document.getElementById('u-safety').value=state.safetyNet;
+  if(state.sip.total) document.getElementById('u-sip').value=state.sip.total;
+  document.getElementById('modal-update').classList.add('open');
+}
+
+function saveAllBalances(){
+  function n(id){const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;}
+  if(n('u-icici')!==null) state.balances.icici=n('u-icici');
+  if(n('u-ubi')!==null) state.balances.ubi=n('u-ubi');
+  if(n('u-slice')!==null) state.balances.slice=n('u-slice');
+  if(n('u-cc')!==null) state.balances.cc=n('u-cc');
+  if(n('u-macbook')!==null){
+    const mac=state.dreamJar.find(g=>g.id==='macbook');
+    if(mac) mac.saved=n('u-macbook');
+  }
+  if(n('u-safety')!==null) state.safetyNet=n('u-safety');
+  if(n('u-sip')!==null) state.sip.total=n('u-sip');
+  const lend=document.getElementById('u-lend').value;
+  if(lend) state.lendAdhi=lend;
+  state.lastFullUpdate=new Date().toISOString();
+  save();renderDashboard();closeModal('modal-update');
+}
+
+/* ─── DREAM JAR ─── */
+function toggleDeadline(){
+  const t=document.getElementById('ag-type').value;
+  document.getElementById('ag-deadline-block').style.display=t==='short'?'block':'none';
+}
+
+function openAddGoalModal(){
+  document.getElementById('ag-name').value='';
+  document.getElementById('ag-target').value='';
+  document.getElementById('ag-saved').value='';
+  document.getElementById('ag-type').value='';
+  document.getElementById('ag-deadline').value='';
+  document.getElementById('ag-notes').value='';
+  document.getElementById('ag-deadline-block').style.display='none';
+  document.getElementById('modal-add-goal').classList.add('open');
+}
+
+function saveNewGoal(){
+  const name=document.getElementById('ag-name').value.trim();
+  const target=parseFloat(document.getElementById('ag-target').value);
+  const saved=parseFloat(document.getElementById('ag-saved').value)||0;
+  const type=document.getElementById('ag-type').value;
+  const deadline=document.getElementById('ag-deadline').value||null;
+  const notes=document.getElementById('ag-notes').value.trim();
+
+  if(!name||isNaN(target)||!type){alert('Please fill in goal name, target amount, and type.');return;}
+  if(type==='short'&&!deadline){alert('Short-term goals need a deadline date.');return;}
+
+  const id='goal_'+Date.now();
+  state.dreamJar.push({id,name,target,saved,type,deadline,notes,done:false,createdAt:new Date().toISOString().split('T')[0]});
+  save();
+  closeModal('modal-add-goal');
+  renderGoals();
+}
+
+let currentAchieveId='';
+function checkDeadlines(){
+  const today=new Date();today.setHours(0,0,0,0);
+  state.dreamJar.forEach(g=>{
+    if(g.done||!g.deadline||state.achieveCheckDone[g.id]) return;
+    const dl=new Date(g.deadline);dl.setHours(0,0,0,0);
+    if(dl<=today){
+      state.achieveCheckDone[g.id]=true;
+      save();
+      setTimeout(()=>showAchieveModal(g.id),400);
+    }
+  });
+}
+
+function showAchieveModal(id){
+  const g=state.dreamJar.find(x=>x.id===id);
+  if(!g) return;
+  currentAchieveId=id;
+  document.getElementById('achieve-emoji').textContent=g.saved>=g.target?'🎉':'⏰';
+  document.getElementById('achieve-title').textContent=g.saved>=g.target?'Did you get it?':'Deadline check — '+g.name;
+  document.getElementById('achieve-body').textContent=
+    g.saved>=g.target
+      ? `Your deadline for ${g.name} (₹${g.target.toLocaleString('en-IN')}) has arrived and you've saved enough! Did you buy it?`
+      : `Your deadline for ${g.name} has passed. You've saved ₹${g.saved.toLocaleString('en-IN')} of ₹${g.target.toLocaleString('en-IN')}. Did you achieve the goal or want to extend?`;
+  document.getElementById('modal-goal-achieve').classList.add('open');
+}
+
+function markGoalDone(){
+  const g=state.dreamJar.find(x=>x.id===currentAchieveId);
+  if(g){g.done=true;g.doneDate=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+  save();closeModal('modal-goal-achieve');renderGoals();renderDashboard();
+}
+
+function extendGoal(){
+  closeModal('modal-goal-achieve');
+  const g=state.dreamJar.find(x=>x.id===currentAchieveId);
+  if(g){
+    document.getElementById('extend-saved').value=g.saved||'';
+    document.getElementById('extend-date').value='';
+  }
+  document.getElementById('modal-extend').classList.add('open');
+}
+
+function saveExtension(){
+  const g=state.dreamJar.find(x=>x.id===currentAchieveId);
+  const newDate=document.getElementById('extend-date').value;
+  const newSaved=parseFloat(document.getElementById('extend-saved').value);
+  if(!newDate){alert('Please pick a new deadline.');return;}
+  if(g){
+    g.deadline=newDate;
+    if(!isNaN(newSaved)) g.saved=newSaved;
+    delete state.achieveCheckDone[g.id];
+  }
+  save();closeModal('modal-extend');renderGoals();
+}
+
+function editGoalSavings(id){
+  const g=state.dreamJar.find(x=>x.id===id);
+  if(!g) return;
+  const newSaved=prompt(`Update savings for "${g.name}" (currently ₹${g.saved.toLocaleString('en-IN')}):`);
+  if(newSaved===null) return;
+  const v=parseFloat(newSaved);
+  if(!isNaN(v)){g.saved=v;save();renderGoals();renderDashboard();}
+}
+
+function deleteGoal(id){
+  const g=state.dreamJar.find(x=>x.id===id);
+  if(!g) return;
+  if(!confirm(`Remove "${g.name}" from Dream Jar?`)) return;
+  state.dreamJar=state.dreamJar.filter(x=>x.id!==id);
+  save();renderGoals();renderDashboard();
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+/* ─── CHECK-IN ─── */
+function renderCheckin(){
+  document.getElementById('checkin-date').textContent=today();
+  const streak=calcStreak();
+  document.getElementById('checkin-streak').textContent=streak+' day streak';
+  renderRecentLog();
+}
+
+function calcStreak(){
+  let streak=0;const d=new Date();
+  for(let i=0;i<30;i++){
+    const dd=new Date(d);dd.setDate(d.getDate()-i);
+    const key=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    if(state.checkins[key]) streak++;
+    else if(i>0) break;
+  }
+  return streak;
+}
+
+function submitCheckin(){
+  const key=todayKey();
+  const entry={
+    date:key,
+    icici:document.getElementById('ci-icici').value,
+    ubi:document.getElementById('ci-ubi').value,
+    slice:document.getElementById('ci-slice').value,
+    cc:document.getElementById('ci-cc').value,
+    macbook:document.getElementById('ci-macbook').value,
+    safety:document.getElementById('ci-safety').value,
+    ts:new Date().toISOString()
+  };
+
+  if(!entry.icici&&!entry.ubi&&!entry.slice&&!entry.cc&&!entry.macbook&&!entry.safety){
+    alert('Please fill in at least one field. Write "nil" if nothing happened.');return;
+  }
+
+  state.checkins[key]=entry;
+
+  // Update balances from macbook/safety if entered
+  const macSave=parseSave(entry.macbook);
+  if(macSave>0){
+    const mac=state.dreamJar.find(g=>g.id==='macbook');
+    if(mac) mac.saved=(mac.saved||0)+macSave;
+  }
+  const safeSave=parseSave(entry.safety);
+  if(safeSave>0) state.safetyNet=(state.safetyNet||0)+safeSave;
+
+  save();
+
+  ['ci-icici','ci-ubi','ci-slice','ci-cc','ci-macbook','ci-safety'].forEach(id=>{document.getElementById(id).value='';});
+
+  renderRecentLog();
+  renderCheckin();
+
+  alert('✓ Today logged! Great job keeping up.');
+}
+
+function parseSave(str){
+  if(!str||str.toLowerCase()==='nil') return 0;
+  const m=str.match(/₹?(\d+)/);
+  return m?parseInt(m[1]):0;
+}
+
+function renderRecentLog(){
+  const el=document.getElementById('recent-log');
+  const keys=Object.keys(state.checkins).sort().reverse().slice(0,5);
+  if(!keys.length){el.innerHTML='';return;}
+  let html='<div class="section-title" style="margin-top:8px">Recent entries</div>';
+  keys.forEach(k=>{
+    const e=state.checkins[k];
+    const d=new Date(k);
+    const dstr=d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+    html+=`<div class="card-sm" style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:600;color:var(--p500)">${dstr}</span>
+        <span class="green-badge">logged ✓</span>
+      </div>
+      ${e.icici&&e.icici!=='nil'?`<div style="font-size:12px;color:var(--muted);margin-bottom:2px">ICICI: ${e.icici}</div>`:''}
+      ${e.ubi&&e.ubi!=='nil'?`<div style="font-size:12px;color:var(--muted);margin-bottom:2px">UBI: ${e.ubi}</div>`:''}
+      ${e.slice&&e.slice!=='nil'?`<div style="font-size:12px;color:var(--muted);margin-bottom:2px">Slice: ${e.slice}</div>`:''}
+      ${e.cc&&e.cc!=='nil'?`<div style="font-size:12px;color:var(--muted);margin-bottom:2px">CC: ${e.cc}</div>`:''}
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+/* ─── CATCH-UP ─── */
+function renderCatchup(){
+  const container=document.getElementById('catchup-dates');
+  // Generate dates from April 14 to yesterday
+  const dates=[];
+  const end=new Date();end.setDate(end.getDate()-1);
+  const start=new Date('2026-04-14');
+  for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+    dates.push(new Date(d));
+  }
+  const missing=dates.filter(d=>{
+    const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    return !state.checkins[key];
+  });
+
+  document.getElementById('missing-count').textContent=missing.length+' days missing';
+
+  if(!missing.length){
+    container.innerHTML='<div class="card" style="text-align:center;padding:24px"><div style="font-size:32px;margin-bottom:8px">🎉</div><div style="font-size:15px;font-weight:600;color:var(--p500)">All caught up!</div><div style="font-size:13px;color:var(--muted);margin-top:4px">No missing entries. You\'re on top of it.</div></div>';
+    return;
+  }
+
+  let html='';
+  missing.forEach((d,idx)=>{
+    const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const dstr=d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+    const dayShort=d.toLocaleDateString('en-IN',{weekday:'short'});
+    html+=`<div class="date-block" id="block-${key}">
+      <div class="date-header">
+        <div><div class="date-str">${dstr}</div></div>
+        <span class="date-status pending">${dayShort} · pending</span>
+      </div>
+      <div class="date-body">
+        <div class="date-q">What happened on this day? Fill what you remember — nil is fine.</div>
+        <div class="acc-mini-row">
+          <div class="acc-mini-dot" style="background:var(--p400)"></div>
+          <span class="acc-mini-label">ICICI</span>
+          <input class="acc-mini-input" id="cu-icici-${key}" type="text" placeholder="e.g. ₹140 auto, nil"/>
+        </div>
+        <div class="acc-mini-row">
+          <div class="acc-mini-dot" style="background:var(--green)"></div>
+          <span class="acc-mini-label">UBI</span>
+          <input class="acc-mini-input" id="cu-ubi-${key}" type="text" placeholder="nil or amount + what"/>
+        </div>
+        <div class="acc-mini-row">
+          <div class="acc-mini-dot" style="background:var(--amber)"></div>
+          <span class="acc-mini-label">Slice</span>
+          <input class="acc-mini-input" id="cu-slice-${key}" type="text" placeholder="nil or amount + what"/>
+        </div>
+        <div class="acc-mini-row">
+          <div class="acc-mini-dot" style="background:var(--red)"></div>
+          <span class="acc-mini-label">CC (6004)</span>
+          <input class="acc-mini-input" id="cu-cc-${key}" type="text" placeholder="nil or amount + where"/>
+        </div>
+        <button class="save-day-btn" onclick="saveCatchupDay('${key}')">Save ${dayShort} ✓</button>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML=html;
+}
+
+function saveCatchupDay(key){
+  const entry={
+    date:key,
+    icici:document.getElementById('cu-icici-'+key).value||'nil',
+    ubi:document.getElementById('cu-ubi-'+key).value||'nil',
+    slice:document.getElementById('cu-slice-'+key).value||'nil',
+    cc:document.getElementById('cu-cc-'+key).value||'nil',
+    catchup:true,
+    ts:new Date().toISOString()
+  };
+  state.checkins[key]=entry;
+  save();
+
+  const block=document.getElementById('block-'+key);
+  const d=new Date(key);
+  const dstr=d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  const dayShort=d.toLocaleDateString('en-IN',{weekday:'short'});
+  block.innerHTML=`<div class="date-header" style="background:linear-gradient(135deg,var(--green),#085041)">
+    <div><div class="date-str">${dstr}</div></div>
+    <span class="date-status done">${dayShort} · saved ✓</span>
+  </div>
+  <div class="date-body"><div class="day-saved">✓ Entry saved for this day</div></div>`;
+
+  const missing=document.querySelectorAll('.date-status.pending').length;
+  document.getElementById('missing-count').textContent=missing+' days missing';
+}
+
+/* ─── CHAT ─── */
+function buildContext(){
+  const b=state.balances;
+  const recentCheckins=Object.entries(state.checkins).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,14);
+  const checkinSummary=recentCheckins.map(([k,v])=>`${k}: ICICI=${v.icici||'nil'} UBI=${v.ubi||'nil'} Slice=${v.slice||'nil'} CC=${v.cc||'nil'}`).join('\n');
+  const macGoal=state.dreamJar.find(g=>g.id==='macbook')||{saved:0};
+  const dreamJarSummary=state.dreamJar.map(g=>`- ${g.name}: ₹${g.saved.toLocaleString('en-IN')} / ₹${g.target.toLocaleString('en-IN')} | ${g.type==='short'?'short-term, deadline: '+g.deadline:'long-term'} | ${g.done?'ACHIEVED':'active'}${g.notes?' | '+g.notes:''}`).join('\n');
+
+  return `You are Raji's personal finance advisor and CFO. Here is her complete current financial data:
+
+IDENTITY: Raji, 19 years old, 3rd year BA LLB student at PES University, Bengaluru. Originally from Salem, Tamil Nadu. Turning 20 on September 24th.
+
+ACCOUNT BALANCES (current):
+- ICICI (day-to-day): ${b.icici!==null?'₹'+b.icici:'not yet updated'}
+- UBI Wealth Vault (fees/buffer/safety): ${b.ubi!==null?'₹'+b.ubi:'not yet updated'}
+- Slice (lifestyle reserve): ${b.slice!==null?'₹'+b.slice:'not yet updated'}
+- Credit Card 6004 (outstanding): ${b.cc!==null?'₹'+b.cc+' owed':'not yet updated'}
+
+SAVINGS & INVESTMENTS:
+- SIP: ₹1,000/month, started Oct 2025, total invested: ${state.sip.total?'₹'+state.sip.total:'unknown'}
+- MacBook savings: ₹${macGoal.saved} (goal ₹79,999, day-by-day savings plan with FDs started Mar/Apr 2026)
+- Safety Net: ${state.safetyNet?'₹'+state.safetyNet:'unknown'} (target ₹15,000)
+- Adhi's ₹1,000 lend: ${state.lendAdhi}
+
+DREAM JAR GOALS:
+${dreamJarSummary||'No goals set yet'}
+
+INCOME: ₹2,500/month salary from Adhithya Holidays (part-time). ₹300/day daily expense allowance.
+
+CREDIT CARD (May 2026 - unpaid): Burger King ₹1,391, Belgium Waffle ₹256, Nykaa (shampoo/conditioner/heat protectant/moisturizer) ₹1,974 = total ₹3,621 unpaid.
+
+RECENT CHECK-INS (last 2 weeks):
+${checkinSummary||'No check-ins yet logged in app'}
+
+ORIGINAL SHEET PATTERNS (Oct 2025 - April 2026): Heavy daily auto travel (₹140 morning + ₹70-80 afternoon ICICI). Regular grocery via Zepto/Blinkit/Instamart. Subscriptions: Netflix ₹199/month, Apple Music ₹59, iCloud ₹100, Google One ₹59. SIP ₹1,000 deducted monthly. Monthly salary ₹2,500 credited. House expenses (electricity ~₹900, wifi ~₹660, maintenance ₹2,000) come from UBI via dad's money (~₹4,000/month). Spending leaks: midnight food runs, impulse snacks, gifts for Adhi.
+
+PERSONALITY: Thoughtful, self-aware about overthinking, small close social circle, enjoys romanticizing daily life. Reward jar running (₹10/week for meeting budgeting goals, 8 weeks = ₹80). Prefers calm, non-judgmental advice.
+
+TODAY: ${today()}
+
+Respond warmly, concisely, and intelligently. Use ₹ for amounts. Point out patterns from her data. Be her financial best friend — honest but kind. No generic advice — always specific to HER numbers.`;
+}
+
+function chipSend(text){
+  addMsg(text,'user');
+  callClaude(text);
+}
+
+function sendChat(){
+  const input=document.getElementById('chat-input');
+  const val=input.value.trim();
+  if(!val) return;
+  input.value='';
+  addMsg(val,'user');
+  state.chatHistory.push({role:'user',content:val});
+  callClaude(val);
+}
+
+function addMsg(text,type){
+  const area=document.getElementById('chat-messages');
+  const row=document.createElement('div');
+  row.className='msg-row '+type;
+  const av=document.createElement('div');
+  av.className='msg-av '+(type==='bot'?'bot-av':'user-av');
+  av.textContent=type==='bot'?'W':'R';
+  const bubble=document.createElement('div');
+  bubble.className='bubble';
+  bubble.textContent=text;
+  row.appendChild(av);row.appendChild(bubble);
+  area.appendChild(row);
+  area.scrollTop=area.scrollHeight;
+  return bubble;
+}
+
+function addTyping(){
+  const area=document.getElementById('chat-messages');
+  const row=document.createElement('div');
+  row.className='msg-row bot';row.id='typing-indicator';
+  const av=document.createElement('div');av.className='msg-av bot-av';av.textContent='W';
+  const bubble=document.createElement('div');bubble.className='bubble';
+  bubble.innerHTML='<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  row.appendChild(av);row.appendChild(bubble);
+  area.appendChild(row);area.scrollTop=area.scrollHeight;
+}
+
+function removeTyping(){
+  const t=document.getElementById('typing-indicator');
+  if(t) t.remove();
+}
+
+async function callClaude(userMsg){
+  addTyping();
+  const ctx=buildContext();
+  const messages=[
+    {role:'user',content:ctx+'\n\n---\nUser message: '+userMsg}
+  ];
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:messages
+      })
+    });
+    const data=await res.json();
+    removeTyping();
+    const reply=data.content&&data.content[0]&&data.content[0].text?data.content[0].text:'Sorry, something went wrong. Try again.';
+    addMsg(reply,'bot');
+    state.chatHistory.push({role:'assistant',content:reply});
+    if(state.chatHistory.length>20) state.chatHistory=state.chatHistory.slice(-20);
+    save();
+  }catch(e){
+    removeTyping();
+    addMsg('Connection issue — make sure you\'re online and try again.','bot');
+  }
+}
+
+/* ─── INIT ─── */
+load();
+renderDashboard();
+renderCheckin();
+document.getElementById('checkin-date').textContent=today();
+</script>
+</body>
+</html>
